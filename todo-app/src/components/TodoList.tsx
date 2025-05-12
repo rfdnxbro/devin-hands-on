@@ -1,19 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Todo } from '../types/todo';
-import { saveTodos, loadTodos } from '../utils/localStorage';
+import { useState, useEffect } from 'react';
+import { Todo } from '@/types/todo';
+import { saveTodos, loadTodos } from '@/utils/localStorage';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputText, setInputText] = useState('');
   
-  // Load todos from localStorage on component mount
   useEffect(() => {
     setTodos(loadTodos());
   }, []);
 
-  // Save todos to localStorage whenever todos change
   useEffect(() => {
     saveTodos(todos);
   }, [todos]);
@@ -33,8 +34,6 @@ export default function TodoList() {
     }
   };
 
-  // Handle form submission (for when user presses Enter)
-  // Note: For Japanese IME, we need to be careful with Enter key handling
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleAddTodo();
@@ -45,43 +44,45 @@ export default function TodoList() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">TODO アプリ</h1>
+    <div className="w-full max-w-md mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">TODO アプリ</h1>
       
-      <form onSubmit={handleSubmit} className="flex mb-4">
-        <input
-          type="text"
+      <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+        <Input
           value={inputText}
           onChange={handleInputChange}
-          className="flex-grow px-4 py-2 border rounded-l focus:outline-none"
           placeholder="新しいTODOを入力"
           data-testid="todo-input"
+          className="flex-grow"
         />
-        <button
+        <Button
           type="button"
           onClick={handleAddTodo}
           disabled={!inputText.trim()}
-          className="px-4 py-2 bg-blue-500 text-white rounded-r disabled:bg-gray-300"
           data-testid="add-button"
+          variant="default"
         >
           登録
-        </button>
+        </Button>
       </form>
       
-      <ul className="space-y-2" data-testid="todo-list">
+      <div className="space-y-3" data-testid="todo-list">
         {todos.map(todo => (
-          <li key={todo.id} className="flex justify-between items-center p-3 border rounded">
-            <span>{todo.text}</span>
-            <button
-              onClick={() => handleCompleteTodo(todo.id)}
-              className="px-3 py-1 bg-green-500 text-white rounded"
-              data-testid="complete-button"
-            >
-              完了
-            </button>
-          </li>
+          <Card key={todo.id} className="shadow-sm">
+            <CardContent className="p-4 flex justify-between items-center">
+              <span className="text-base">{todo.text}</span>
+              <Button
+                onClick={() => handleCompleteTodo(todo.id)}
+                data-testid="complete-button"
+                variant="outline"
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                完了
+              </Button>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
